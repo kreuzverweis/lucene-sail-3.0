@@ -1,0 +1,183 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.openrdf.sesame</groupId>
+	<artifactId>sesame-sail-lucenesail</artifactId>
+
+	<packaging>jar</packaging>
+	<!-- using a three-digit version number, for OSGi compliance -->
+	<!-- if you change version number here, change it in the bundle Manifest 
+		below too -->
+	<version>3.0.0-SNAPSHOT</version>
+	<name>OpenRDF Lucene Sail</name>
+	<description>StackableSail implementation offering full-text search on literals, based on Apache Lucene.</description>
+
+	<properties>
+		<sesame.version>3.0.0-SNAPSHOT</sesame.version>
+		<lucene.version>2.9.1</lucene.version>
+		<slf4j.version>1.5.8</slf4j.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-api</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-queryalgebra-evaluation</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.openrdf.sesame</groupId> <artifactId>sesame-runtime</artifactId> 
+			<version>${sesame.version}</version> <scope>test</scope> </dependency> -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+
+        <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<!-- FIXME: following dependencies added due to LuceneSailExample -->
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-repository-sail</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openrdf.sesame</groupId>
+			<artifactId>sesame-sail-memory</artifactId>
+			<version>${sesame.version}</version>
+		</dependency>
+		<!-- FIXME: dependencies above added due to LuceneSailExample -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+			<scope>test</scope>
+		</dependency>
+
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+
+			<!-- add OSGI specific metadata to the manifest how to do this? http://maven.apache.org/guides/mini/guide-manifest.html 
+				there may be a MVN-OSGi conformant way, but unless MVN completly integrates 
+				with OSGi and the dependencies declared in maven map directly to OSGi dependencies, 
+				I would not touch this further, and just fiddle with the options. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<!-- <index>true</true> -->
+						<manifestEntries>
+							<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+							<Bundle-Name>Lucene Plug-in</Bundle-Name>
+							<Bundle-SymbolicName>org.openrdf.sail.lucene</Bundle-SymbolicName>
+							<!-- NOTE: the Maven naming does NOT work because in OSGi, the versioning 
+								has to be [num].[num].[num].[alphanum] -->
+							<!--Bundle-Version>${pom.version}</Bundle-Version -->
+							<Bundle-Version>3.0.0.snapshot</Bundle-Version>
+							<Bundle-Vendor>Aduna-Software, DFKI GmbH, Kreuzverweis Solutions GmbH</Bundle-Vendor>
+							<Bundle-Localization>plugin</Bundle-Localization>
+							<Require-Bundle>org.apache.lucene.analysis;bundle-version="${lucene.version}",org.apache.lucene;bundle-version="${lucene.version}",org.apache.lucene.highlighter;bundle-version="${lucene.version}",org.apache.lucene.core;bundle-version="${lucene.version}"</Require-Bundle> 
+                            <Import-Package>org.slf4j</Import-Package>
+							<Fragment-Host>org.openrdf.sesame3</Fragment-Host>
+							<Export-Package>org.openrdf.sail.lucene,org.openrdf.sail.lucene.config</Export-Package>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+			<id>aduna-repo</id>
+			<name>Aduna Repository</name>
+			<url>http://repo.aduna-software.org/maven2/releases</url>
+		</repository>
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<id>aduna-snapshot-repo</id>
+			<name>Aduna Snapshot Repository</name>
+			<url>http://repo.aduna-software.org/maven2/snapshots</url>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>ftp-aduna-repo</id>
+			<name>Aduna Repository</name>
+			<url>ftp://repository.aduna-software.org//space/aduna/hosts/repository.aduna-software.org/htdocs/maven2</url>
+			<uniqueVersion>true</uniqueVersion>
+		</repository>
+		<snapshotRepository>
+			<id>ftp-aduna-repo</id>
+			<name>Aduna Snapshot Repository</name>
+			<url>ftp://repository.aduna-software.org//space/aduna/hosts/repository.aduna-software.org/htdocs/maven2-snapshots</url>
+			<uniqueVersion>true</uniqueVersion>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<scm>
+		<connection>scm:svn:http://repo.aduna-software.org/svn/org.openrdf/sesame-ext/lucenesail/trunk/</connection>
+		<developerConnection>scm:svn:https://repo.aduna-software.org/svn/org.openrdf/sesame-ext/lucenesail/trunk/</developerConnection>
+		<url>http://repo.aduna-software.org/viewvc/org.openrdf/sesame-ext/lucenesail/trunk/</url>
+	</scm>
+
+</project>
